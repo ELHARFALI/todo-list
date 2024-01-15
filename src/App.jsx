@@ -1,9 +1,12 @@
-import { useId, useState } from "react";
+import {  useState } from "react";
 import { FaTrash } from "react-icons/fa";
+
+import { nanoid } from "nanoid";
 
 function App() {
   const [value, setValue] = useState('')
   const [text, setText] = useState([])
+  const [completed, setCompleted] = useState(false)
 
   
 
@@ -14,14 +17,19 @@ function App() {
 
   const addTask = () => {
     if (value) {
-      setText((prev) => [...prev, value])
+      const newTask = {
+        id: nanoid(),
+        text: value
+      }
+      setText((prev) => [...prev, newTask])
       setValue('')
     }
     return
   }
 
-  const deleteTask = (i) => {
-
+  const deleteTask = (id) => {
+    const newTasks = text.filter((t) => t.id !== id)
+    setText(newTasks)
   }
 
   return (
@@ -35,34 +43,26 @@ function App() {
           <button type="button" onClick={addTask} className="px-3 h-[40px] lg:h-[45px] bg-[#00ADB5] rounded-tr-lg rounded-br-lg font-medium text-lg hover:opacity-80">Add</button>
         </form>
         <div className="mt-8 lg:mt-10  p-4 rounded-lg flex justify-center items-center flex-col">
-          <h1 className="text-xl lg:text-2xl text-[#EEEEEE] mb-6">Tasks:</h1>
+          {text.length > 0 ? <h1 className="text-xl lg:text-2xl text-[#EEEEEE] mb-6">Tasks:</h1> : null}
           <div className="grid gap-y-2">
             {text.map((t) => {
+              const {id, text} = t
               return (
-                <div className="w-[400px] lg:w-[550px] flex justify-between items-center bg-[#CBF1F5] text-black p-2 lg:p-3 rounded-lg" key={new Date}>
+                <div className={`
+                  ${completed ? 'w-[400px] lg:w-[550px] flex justify-between items-center bg-[#393E46] text-white p-2 lg:p-3 rounded-lg' : 'w-[400px] lg:w-[550px] flex justify-between items-center bg-[#CBF1F5] text-black p-2 lg:p-3 rounded-lg'}
+                `}  key={id}>
               <div className="flex gap-x-3">
-              <input type="checkbox" name="checkbox" />
-                    <h3 className="text-lg lg:text-xl font-medium">{t}</h3>
+              <input type="checkbox" name="checkbox" checked={completed} onChange={() => setCompleted(!completed)} />
+                    <h3 className="text-lg lg:text-xl font-medium">{!completed ? text : <strike>{text}</strike>}</h3>
               </div>
               <div className="flex justify-center items-center">
-                <button  type="button" className="p-2 text-white bg-red-500 hover:bg-red-400 rounded-lg">
+                <button  type="button" className="p-2 text-white bg-red-500 hover:bg-red-400 rounded-lg" onClick={() => deleteTask(id)}>
                   <FaTrash className="lg:text-[18px]" />
                 </button>
               </div>
             </div>
               )
             })}
-            <div className="w-[400px] lg:w-[550px] flex justify-between items-center bg-[#393E46] text-white p-2 lg:p-3 rounded-lg">
-              <div className="flex gap-x-3">
-              <input type="checkbox" name="checkbox" />
-              <h3 className="text-lg lg:text-xl font-medium"><strike>lunch</strike></h3>
-              </div>
-              <div className="flex justify-center items-center">
-                <button  type="button" className="p-2 text-white bg-red-500 hover:bg-red-400 rounded-lg">
-                  <FaTrash className="lg:text-[18px]" />
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       </div>
